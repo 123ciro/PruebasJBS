@@ -1,4 +1,4 @@
-package py.com.oym.test.bussines;
+package com.mycompany.pruebasjbs.bussines;
 
 import java.util.Properties;
 import javax.naming.Context;

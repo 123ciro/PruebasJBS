@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package py.com.oym.test.bussines;
+package com.mycompany.pruebasjbs.bussines;
 
 import java.math.BigDecimal;
 import javax.naming.NamingException;
