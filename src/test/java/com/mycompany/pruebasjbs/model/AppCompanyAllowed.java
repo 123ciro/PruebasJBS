@@ -1,4 +1,4 @@
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.model;
 
 import java.util.Date;
 import javax.persistence.Basic;

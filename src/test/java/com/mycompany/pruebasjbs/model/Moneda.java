@@ -1,8 +1,9 @@
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,8 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -24,22 +25,20 @@ import javax.validation.constraints.Size;
 import org.javabeanstack.data.DataRow;
 
 @Entity
-@Table(name = "pais", 
+@Table(name = "moneda", 
         uniqueConstraints = { @UniqueConstraint(columnNames = 
                                                { "idempresa", "codigo"}) })
-public class Pais extends DataRow implements Serializable {
-
-    private static final Long serialVersionUID = 1L;
+public class Moneda  extends DataRow implements Serializable {
+    private static final long serialVersionUID = 1L; 
     
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "idpais")
-    private Long idpais;
-    
+    @Column(name = "idmoneda")
+    private Long idmoneda;
+ 
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 4)
     @Column(name = "codigo")
     private String codigo;
     
@@ -49,15 +48,19 @@ public class Pais extends DataRow implements Serializable {
     @Column(name = "nombre")
     private String nombre;
     
-    @Column(name = "noedit")
-    private Boolean noedit;
-    
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "latitud")
-    private BigDecimal latitud;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "cambio")
+    private BigDecimal cambio;
     
-    @Column(name = "Longitud")
-    private BigDecimal Longitud;
+    @Column(name = "decimalpoint")
+    private Short decimalpoint;
+    
+    @Lob
+    @Size(max = 2147483647)
+    @Column(name = "observacion")
+    private String observacion;
     
     @Column(name = "fechamodificacion")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,35 +69,23 @@ public class Pais extends DataRow implements Serializable {
     @Size(max = 32)
     @Column(name = "appuser")
     private String appuser;
+
+    @OneToMany(mappedBy = "moneda")
+    private List<Pais> paises;
     
-    @JoinColumn(name = "idregion", referencedColumnName = "idregion")
-    @ManyToOne(optional = true)
-    private Region region = new Region();
-    
-    @JoinColumn(name = "idmoneda", referencedColumnName = "idmoneda")
-    @ManyToOne
-    private Moneda moneda;
-    /*
-    @OneToMany
-    private List<Provincia> listadoProvincia = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "pais")
-    private List<Persona> listadoPersona = new ArrayList<>();
-    */
     //@JoinColumn(name = "idempresa", referencedColumnName = "idempresa")
-    
     @Column(name = "idempresa")    
     private Long idempresa;
 
-    public Pais() {
+    public Moneda() {
     }
 
-    public Long getIdpais() {
-        return idpais;
+    public Long getIdmoneda() {
+        return idmoneda;
     }
 
-    public void setIdpais(Long idpais) {
-        this.idpais = idpais;
+    public void setIdmoneda(Long idmoneda) {
+        this.idmoneda = idmoneda;
     }
 
     public String getCodigo() {
@@ -119,37 +110,34 @@ public class Pais extends DataRow implements Serializable {
         this.nombre = nombre;
     }
 
-    public Boolean isNoedit() {
-        return noedit;
+    public BigDecimal getCambio() {
+        return cambio;
     }
 
-    public void setNoedit(Boolean noedit) {
-        this.noedit = noedit;
+    public void setCambio(BigDecimal cambio) {
+        this.cambio = cambio;
     }
 
-    public BigDecimal getLatitud() {
-        return latitud;
+    public Short getDecimalpoint() {
+        return decimalpoint;
     }
 
-    public void setLatitud(BigDecimal latitud) {
-        this.latitud = latitud;
+    public void setDecimalpoint(Short decimalpoint) {
+        this.decimalpoint = decimalpoint;
     }
 
-    public BigDecimal getLongitud() {
-        return Longitud;
+    public String getObservacion() {
+        return observacion;
     }
 
-    public void setLongitud(BigDecimal Longitud) {
-        this.Longitud = Longitud;
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 
     public Date getFechamodificacion() {
         return fechamodificacion;
     }
 
-    public void setFechamodificacion(Date fechamodificacion) {
-        this.fechamodificacion = fechamodificacion;
-    }
 
     public String getAppuser() {
         return appuser;
@@ -159,22 +147,18 @@ public class Pais extends DataRow implements Serializable {
         this.appuser = appuser;
     }
 
-    public Region getRegion() {
-        return region;
+    public List<Pais> getPaises() {
+        return paises;
     }
 
-    public void setRegion(Region region) {
-        this.region = region;
+    public Long getIdempresa() {
+        return idempresa;
     }
 
-    public Moneda getMoneda() {
-        return moneda;
+    public void setIdempresa(Long idempresa) {
+        this.idempresa = idempresa;
     }
-
-    public void setMoneda(Moneda moneda) {
-        this.moneda = moneda;
-    }
-
+    
     @PrePersist
     public void prePersist() {
         fechamodificacion = new Date();
@@ -187,29 +171,18 @@ public class Pais extends DataRow implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.idpais);
+        int hash = 0;
+        hash += (idmoneda != null ? idmoneda.hashCode() : 0);
         return hash;
     }
 
-    public Long getIdempresa() {
-        return idempresa;
-    }
-
-    public void setIdempresa(Long idempresa) {
-        this.idempresa = idempresa;
-    }
-
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals(Object object) {
+        if (!(object instanceof Moneda)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Pais other = (Pais) obj;
-        if (!Objects.equals(this.idpais, other.idpais)) {
+        Moneda other = (Moneda) object;
+        if ((this.idmoneda == null && other.idmoneda != null) || (this.idmoneda != null && !this.idmoneda.equals(other.idmoneda))) {
             return false;
         }
         return true;
@@ -217,16 +190,16 @@ public class Pais extends DataRow implements Serializable {
 
     @Override
     public boolean equivalent(Object o) {
-        if (!(o instanceof Pais)) {
+        if (!(o instanceof Moneda)) {
             return false;
         }
-        Pais obj = (Pais) o;
+        Moneda obj = (Moneda) o;
         return (this.codigo.trim().equals(obj.getCodigo().trim()) && 
                 Objects.equals(this.idempresa, obj.getIdempresa()));
     }
     
     @Override
     public String toString() {
-        return "Pais{" + "idpais=" + idpais + ", codigo=" + codigo + ", nombre=" + nombre + ", noedit=" + noedit + ", latitud=" + latitud + ", Longitud=" + Longitud + '}';
+        return "[\n idmoneda=" + idmoneda + "\n codigo= "+ codigo  + "\n nombre= "+ nombre+"  \n]\n";
     }
 }

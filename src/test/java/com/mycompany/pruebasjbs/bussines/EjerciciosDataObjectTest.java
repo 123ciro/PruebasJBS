@@ -11,7 +11,7 @@ import org.javabeanstack.data.IGenericDAORemote;
 import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
 import org.javabeanstack.exceptions.SessionError;
-import org.javabeanstack.model.tables.Moneda;
+import com.mycompany.pruebasjbs.model.Moneda;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

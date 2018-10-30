@@ -1,4 +1,4 @@
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.model;
 
 import java.util.Objects; 
 import javax.persistence.Basic;

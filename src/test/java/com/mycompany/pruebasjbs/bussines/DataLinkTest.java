@@ -13,7 +13,7 @@ import org.javabeanstack.data.IDataRow;
 import org.javabeanstack.data.IGenericDAORemote;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.javabeanstack.model.tables.Moneda;
+import com.mycompany.pruebasjbs.model.Moneda;
 
 public class DataLinkTest extends TestClass {
 

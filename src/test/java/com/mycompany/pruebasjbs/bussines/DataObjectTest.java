@@ -13,11 +13,11 @@ import org.javabeanstack.data.model.DataSet;
 import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
 import org.javabeanstack.exceptions.SessionError;
-import org.javabeanstack.model.tables.Moneda;
-import org.javabeanstack.model.tables.Pais;
+import com.mycompany.pruebasjbs.model.Moneda;
+import com.mycompany.pruebasjbs.model.Pais;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.javabeanstack.model.tables.Region;
+import com.mycompany.pruebasjbs.model.Region;
 
 public class DataObjectTest extends TestClass {
 
