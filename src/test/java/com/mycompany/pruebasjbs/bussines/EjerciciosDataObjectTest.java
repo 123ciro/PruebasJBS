@@ -19,9 +19,10 @@ public class EjerciciosDataObjectTest extends TestClass {
     
     private static IGenericDAORemote dao;
     
+    
     @Test
     public void delete() throws Exception, NamingException, SessionError {
-        System.out.println("OPEN,INSERT,DELETE AND CLOSE");
+        System.out.println("OPEN,INSERT,DELETE,CLOSE and SETFIELD");
         if (error != null) {
             System.out.println(error);
             return;
@@ -67,6 +68,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         moneda.requery();
         
         System.out.println("Set Filter--> " + moneda.getRow());
+        assertNotNull(moneda.getRow());
     }
     
     @Test
