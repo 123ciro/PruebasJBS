@@ -19,9 +19,8 @@ public class EjerciciosDataObjectTest extends TestClass {
     
     private static IGenericDAORemote dao;
     
-    
     @Test
-    public void delete() throws Exception, NamingException, SessionError {
+    public void varios() throws Exception, NamingException, SessionError {
         System.out.println("OPEN,INSERT,DELETE,CLOSE and SETFIELD");
         if (error != null) {
             System.out.println(error);
@@ -120,11 +119,10 @@ public class EjerciciosDataObjectTest extends TestClass {
         
         System.out.println("Registros --> " + moneda.getDataRows());
     }
-
-    //ver como se hace
+    
     @Test
-    public void testReadWrite() throws Exception, NamingException, SessionError {
-        System.out.println("ReadWrite");
+    public void testReadWriteFalse() throws Exception, NamingException, SessionError {
+        System.out.println("ReadWrite False");
         if (error != null) {
             System.out.println(error);
             return;
@@ -132,14 +130,42 @@ public class EjerciciosDataObjectTest extends TestClass {
         
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //en este caso no va a insertar el registro porque esta en false el ReadWrite
+        moneda.setReadWrite(false);
+        moneda.insertRow();
+        moneda.setField("codigo", "PER");
+        moneda.setField("nombre", "PERU");
+        moneda.setField("cambio", BigDecimal.valueOf(1.65));
+        Boolean result= moneda.update(false);
+        
+        assertFalse(result);
+        
+    }
+    
+    @Test
+    public void testReadWriteTrue() throws Exception, NamingException, SessionError {
+        System.out.println("ReadWrite True");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        //aca si permite ingresar los datos ya que el readwrite esta en true
         moneda.setReadWrite(true);
         moneda.insertRow();
         moneda.setField("codigo", "PER");
         moneda.setField("nombre", "PERU");
+        moneda.setField("cambio", BigDecimal.valueOf(1.65));
+        Boolean result = moneda.update(false);
+        assertTrue(result);
         
-        moneda.update(false);
-
-        //System.out.println("Registros --> " + moneda.getDataRows());
+        if (moneda.find("codigo", "PER")){
+            moneda.deleteRow();
+            moneda.update(false);
+        }
+        
     }
     
     @Test
@@ -154,6 +180,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         moneda.open();
         
         assertFalse(moneda.isForeingKey("pais"));
+        assertTrue(!moneda.isForeingKey("pais"));
         
     }
     
@@ -221,8 +248,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         assertEquals(pos, moneda.getRecno());
         moneda.close();
     }
-
-    //ver como se hace
+    
     @Test
     public void testGoTo() throws Exception, NamingException, SessionError {
         System.out.println("GoTo");
@@ -234,6 +260,9 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.goTo(2);
+        String esperado = "EUR";
+        System.out.println("valor -->" + moneda.getRow());
+        assertEquals(esperado, moneda.getField("codigo"));
         
     }
     
@@ -310,6 +339,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         int canti = 3;
+        System.out.println("cantidad de valores -->" + moneda.getRowCount());
         assertEquals(canti, moneda.getRowCount());
         
     }
@@ -324,8 +354,51 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.insertRow();
-        assertNull(moneda.getErrorApp());        
+        //se quiere ingresar en una columna que no existe en la tabla
+        moneda.setField("cantidad", "5");
+        //se pone un not null ya que si existe error.
+        assertNotNull(moneda.getErrorApp());
     }
     
+    @Test
+    public void testGetErrorMsg() throws Exception, NamingException, SessionError {
+        System.out.println("Get Error Msg");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.insertRow();
+        //se quiere ingresar en una columna que no existe en la tabla
+        moneda.setField("cantidad", "5");
+        // El mensaje de error ya que la columna cantidad no existe
+        System.out.println("Mensaje de Error --> " + moneda.getErrorMsg(true));
+        
+        assertNotNull(moneda.getErrorMsg(true));
+    }
+    
+    @Test
+    public void testCheckDataRow() throws Exception, NamingException, SessionError {
+        System.out.println("Check Data Row");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.insertRow();
+        moneda.setField("codigo", "URU");
+        moneda.setField("nombre", "Uruguay");
+        moneda.setField("cambio", BigDecimal.TEN);
+        moneda.update(false);
+        assertTrue(moneda.checkData(true));
+
+        //Se encuentra el codigo URU y elimina los datos.
+        if (moneda.find("codigo", "URU")) {
+            moneda.deleteRow();
+            moneda.update(false);
+        }
+    }
     
 }
