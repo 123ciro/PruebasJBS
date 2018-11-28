@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.pruebasjbs.bussines;
 
 import java.math.BigDecimal;
@@ -30,13 +25,13 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
+        //MONEDA
         IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-        if (!moneda.find("codigo", "$")) {
+        if (!moneda.find("codigo", "URU")) {
             moneda.insertRow();
-            moneda.setField("codigo", "$");
-            moneda.setField("nombre", "DOLARES");
+            moneda.setField("codigo", "URU");
+            moneda.setField("nombre", "Uruguay");
             moneda.setField("cambio", BigDecimal.ONE);
             boolean result = moneda.update(false);
 
@@ -44,7 +39,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         }
 
-        if (moneda.find("codigo", "$")) {
+        if (moneda.find("codigo", "URU")) {
             moneda.deleteRow();
             boolean result = moneda.update(false);
 
@@ -65,9 +60,10 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.setFilter("codigo = 'EUR'");
+        moneda.getFilter();
         moneda.requery();
 
-        System.out.println("Set Filter--> " + moneda.getRow());
+        System.out.println("Moneda Filtrada--> " + moneda.getRow());
         assertNotNull(moneda.getRow());
     }
 
@@ -82,9 +78,10 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.setOrder("idmoneda asc");
+        moneda.getOrder();
         moneda.requery();
 
-        System.out.println("Order --> " + moneda.getDataRows());
+        System.out.println("Moneda Ordenada --> " + moneda.getDataRows());
     }
 
     @Test
@@ -97,11 +94,11 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-        moneda.setFirstRow(0);
+        moneda.setFirstRow(2);
         moneda.getFirstRow();
         moneda.requery();
 
-        System.out.println("Registros --> " + moneda.getDataRows());
+        System.out.println("Registro --> " + moneda.getRow());
     }
 
     @Test
@@ -114,6 +111,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //Cantidad de registros que queremos traer
         moneda.setMaxRows(2);
         moneda.getMaxRows();
         moneda.requery();
@@ -131,7 +129,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-        //en este caso no va a insertar el registro porque esta en false el ReadWrite
+        //En este caso no va a insertar el registro porque esta en false el ReadWrite
         moneda.setReadWrite(false);
         moneda.insertRow();
         moneda.setField("codigo", "PER");
@@ -153,7 +151,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-        //aca si permite ingresar los datos ya que el readwrite esta en true
+        //aca si permite ingresar los datos ya que el Readwrite esta en true
         moneda.setReadWrite(true);
         moneda.insertRow();
         moneda.setField("codigo", "PER");
@@ -251,6 +249,52 @@ public class EjerciciosDataObjectTest extends TestClass {
     }
 
     @Test
+    public void testGetField() throws Exception, NamingException, SessionError {
+        System.out.println("GetField");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.find("codigo", "EUR");
+        String cod = "EUR";
+        System.out.println("valor ->" + moneda.getRow());
+        assertEquals(cod, moneda.getField("codigo"));
+
+    }
+
+    @Test
+    public void testFind() throws Exception, NamingException, SessionError {
+        System.out.println("Find");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.find("codigo", "EUR");
+        assertNotNull(moneda.getRow());
+
+    }
+
+    @Test
+    public void testGetFindNext() throws Exception, NamingException, SessionError {
+        System.out.println("FindNext");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.find("codigo", "GS ");
+        moneda.findNext();
+        moneda.requery();
+        assertTrue(moneda.findNext());
+
+    }
+
+    @Test
     public void testGoTo() throws Exception, NamingException, SessionError {
         System.out.println("GoTo");
         if (error != null) {
@@ -327,6 +371,25 @@ public class EjerciciosDataObjectTest extends TestClass {
         moneda.moveLast();
         String esperado = "EUR";
         assertEquals(esperado, moneda.getField("codigo"));
+    }
+
+    @Test
+    public void testIsEoF() throws Exception, NamingException, SessionError {
+        System.out.println("EoF: significa el final de la lista");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
+        moneda.open();
+        moneda.moveLast();
+        assertFalse(moneda.isEof());
+
+        moneda.moveLast();
+        moneda.moveNext();
+        assertTrue(moneda.isEof());
+
     }
 
     @Test
@@ -460,8 +523,339 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         moneda.revert(dataSet);
 
-        assertTrue("Los registros que estaban en memoria para guardarse ahora estan vacios. ", moneda.getDataRowsChanged().isEmpty());
+        assertTrue("El registro que estaba en memoria para guardarse ahora esta vacio. ", moneda.getDataRowsChanged().isEmpty());
+
+    }
+
+    @Test
+    public void BeforeOpen() throws Exception, NamingException, SessionError {
+        System.out.println("Open Con Parametros");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        // DataEventsTest dataEvents = new DataEventsTest();
+        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
+
+        moneda.open("idmoneda desc", null, true, 10);
+        System.out.println("datos " + moneda.getDataRows());
+
+        if (!moneda.find("codigo", "URU")) {
+            moneda.insertRow();
+            moneda.setField("codigo", "URU");
+            moneda.setField("nombre", "Uruguay");
+            moneda.setField("cambio", BigDecimal.TEN);
+            moneda.update(false);
+        }
+
+        if (moneda.find("codigo", "URU")) {
+
+            moneda.deleteRow();
+            moneda.update(false);
+
+        }
+
+    }
+
+    @Test
+    public void IdCompany() throws Exception, NamingException, SessionError {
+        System.out.println("Id Company");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
+
+        System.out.println("Id Empresa ->" + moneda.getIdcompany());
 
     }
 
 }
+//
+////Clase de los Data Events
+//class DataEventsTest extends DataEvents {
+//
+//    int beforeOpen = 0;
+//    int beforeDataFill = 0;
+//    int afterDataFill = 0;
+//    int afterOpen = 0;
+//    int beforeRequery = 0;
+//    int afterRequery = 0;
+//    int onAllowOperation = 0;
+//    int beforeRowMove = 0;
+//    int afterRowMove = 0;
+//    int beforeRefreshRow = 0;
+//    int afterRefreshRow = 0;
+//    int beforeSetfield = 0;
+//    int afterSetfield = 0;
+//    int beforeInsertRow = 0;
+//    int afterInsertRow = 0;
+//    int beforeDeleteRow = 0;
+//    int afterDeleteRow = 0;
+//    int beforeUpdate = 0;
+//    int beforeCheckData = 0;
+//    int afterCheckData = 0;
+//    int afterUpdate = 0;
+//    int beforeClose = 0;
+//    int afterClose = 0;
+//
+//    @Override
+//    public boolean onAllowOperation() {
+//        assertTrue(getContext().getRow() != null);
+//        onAllowOperation++;
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean beforeRowMove(IDataRow curRow) {
+//        beforeRowMove++;
+//        return true;
+//    }
+//
+//    @Override
+//    public void afterRowMove(IDataRow newRow) {
+//        if (!getContext().isEof()) {
+//            assertNotNull(newRow);
+//        }
+//        afterRowMove++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes buscar los registros en la base de datos.
+//     *
+//     * @param order orden de la selección de datos.
+//     * @param filter filtro de datos.
+//     * @param readwrite si es lectura/escritura
+//     * @param maxrows maxima cantidad de registros a recuperar.
+//     */
+//    @Override
+//    public void beforeOpen(String order, String filter, boolean readwrite, int maxrows) {
+//        assertFalse(getContext().isOpen());
+//        beforeOpen++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes de recuperar los datos de la base de datos.
+//     */
+//    @Override
+//    public void beforeDataFill() {
+//        assertFalse(getContext().isOpen());
+//        beforeDataFill++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior a la recuperación de los registros de la base de
+//     * datos.
+//     */
+//    @Override
+//    public void afterDataFill() {
+//        assertTrue(getContext().isOpen());
+//        afterDataFill++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior a la recuperación de los registros de la base de
+//     * datos.
+//     *
+//     * @param order orden de la selección de datos.
+//     * @param filter filtro de datos.
+//     * @param readwrite si es lectura/escritura.
+//     * @param maxrows maxima cantidad de registros que deberian haberse
+//     * recuperado.
+//     */
+//    @Override
+//    public void afterOpen(String order, String filter, boolean readwrite, int maxrows) {
+//        assertTrue(getContext().isOpen());
+//        afterOpen++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes de recuperar los registros de la base de datos.
+//     */
+//    @Override
+//    public void beforeRequery() {
+//        assertTrue(getContext().isOpen());
+//        beforeRequery++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior a haberse recuperado los registros de la base de
+//     * datos.
+//     */
+//    @Override
+//    public void afterRequery() {
+//        assertTrue(getContext().isOpen());
+//        afterRequery++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes de refrescar los datos de un registro de la base de
+//     * datos.
+//     *
+//     * @param row registro a refrescar
+//     */
+//    @Override
+//    public void beforeRefreshRow(IDataRow row) {
+//        assertNotNull(row);
+//        beforeRefreshRow++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior a refrescar un registro de la base de datos.
+//     *
+//     * @param row registro refrescado.
+//     */
+//    @Override
+//    public void afterRefreshRow(IDataRow row) {
+//        assertNotNull(row);
+//        afterRefreshRow++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes del metodo insertRow
+//     *
+//     * @param newRow fila a ser insertada
+//     * @return verdadero o falso si se permite o no la inserción.
+//     */
+//    @Override
+//    public boolean beforeInsertRow(IDataRow newRow) {
+//        assertNotNull(newRow);
+//        beforeInsertRow++;
+//        return true;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior al metodo insertRow
+//     *
+//     * @param row registro insertado
+//     */
+//    @Override
+//    public void afterInsertRow(IDataRow row) {
+//        assertNotNull(row);
+//        afterInsertRow++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes del metodo deleteRow
+//     *
+//     * @param row fila a ser marcada para eliminarse.
+//     * @return verdadero o falso si es permitido o no la operación.
+//     */
+//    @Override
+//    public boolean beforeDeleteRow(IDataRow row) {
+//        assertNotNull(row);
+//        beforeDeleteRow++;
+//        return true;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior al metodo deleteRow.
+//     */
+//    @Override
+//    public void afterDeleteRow() {
+//        assertTrue(getContext().getRecStatus() == IDataRow.DELETE);
+//        afterDeleteRow++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes del metodo setField.
+//     *
+//     * @param row registro
+//     * @param fieldname nombre del campo
+//     * @param oldValue valor anterior
+//     * @param newValue nuevo valor.
+//     * @return verdadero o falso si se permite la modificación del campo
+//     */
+//    @Override
+//    public boolean beforeSetField(IDataRow row, String fieldname, Object oldValue, Object newValue) {
+//        assertNotNull(row);
+//        assertTrue(getContext().isFieldExist(fieldname));
+//        beforeSetfield++;
+//        return true;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior al metodo setField
+//     *
+//     * @param row registro
+//     * @param fieldname nombre del campo
+//     * @param oldValue valor anterior
+//     * @param newValue nuevo valor
+//     * @return verdadero o falso si tuvo exito.
+//     */
+//    @Override
+//    public boolean afterSetField(IDataRow row, String fieldname, Object oldValue, Object newValue) {
+//        assertNotNull(row);
+//        assertTrue(getContext().isFieldExist(fieldname));
+//        afterSetfield++;
+//        return true;
+//    }
+//
+//    /**
+//     * Se ejecuta antes del metodo update
+//     *
+//     * @param allRows si se va a procesar todos los registros
+//     * @return verdadero o falso si se permite la ejecución de update.
+//     */
+//    @Override
+//    public boolean beforeUpdate(boolean allRows) {
+//        assertTrue(getContext().isOpen());
+//        beforeUpdate++;
+//        return true;
+//    }
+//
+//    /**
+//     * Se ejecuta antes del metodo checkData
+//     *
+//     * @param allRows si se esta procesando todos los registros modificados, o
+//     * solo el actual.
+//     */
+//    @Override
+//    public void beforeCheckData(boolean allRows) {
+//        assertTrue(getContext().isOpen());
+//        beforeCheckData++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior al metodo checkData
+//     *
+//     * @param allRows si se proceso todos los registros.
+//     */
+//    @Override
+//    public void afterCheckData(boolean allRows) {
+//        assertTrue(getContext().isOpen());
+//        afterCheckData++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior al metodo update
+//     *
+//     * @param allRows se se proceso todos los registros modificados.
+//     */
+//    @Override
+//    public void afterUpdate(boolean allRows) {
+//        assertTrue(getContext().isOpen());
+//        afterUpdate++;
+//    }
+//
+//    /**
+//     * Se ejecuta antes de cerrar el dataObject
+//     */
+//    @Override
+//    public void beforeClose() {
+//        assertTrue(getContext().isOpen());
+//        beforeClose++;
+//    }
+//
+//    /**
+//     * Se ejecuta posterior a cerrar el dataObject.
+//     */
+//    @Override
+//    public void afterClose() {
+//        assertFalse(getContext().isOpen());
+//        afterClose++;
+//    }
+//
+//}
