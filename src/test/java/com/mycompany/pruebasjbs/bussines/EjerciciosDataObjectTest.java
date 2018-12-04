@@ -1,5 +1,7 @@
 package com.mycompany.pruebasjbs.bussines;
 
+import com.mycompany.pruebasjbs.tables.Moneda;
+import com.mycompany.pruebasjbs.tables.Pais;
 import java.math.BigDecimal;
 import java.util.Map;
 import javax.naming.NamingException;
@@ -10,7 +12,6 @@ import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
 import org.javabeanstack.error.IErrorReg;
 import org.javabeanstack.exceptions.SessionError;
-import com.mycompany.pruebasjbs.model.Moneda;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -182,6 +183,23 @@ public class EjerciciosDataObjectTest extends TestClass {
         assertTrue(!moneda.isForeingKey("pais"));
 
     }
+    
+        @Test
+    public void testClaveForaneaPais() throws Exception, NamingException, SessionError {
+        System.out.println("Clave Foranea");
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        IDataObject<Pais> pais = new DataObject(Pais.class, null, dataLink, null);
+        pais.open();
+
+        
+        assertTrue(pais.isForeingKey("Region"));
+
+    }
+    
 
     @Test
     public void testColumnaExiste() throws Exception, NamingException, SessionError {
@@ -206,15 +224,12 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.setFilter("idmoneda=245");
         moneda.requery();
         System.out.println("Valor -->" + moneda.getRow());
-
         assertNotNull(moneda.getRow());
-
     }
 
     @Test

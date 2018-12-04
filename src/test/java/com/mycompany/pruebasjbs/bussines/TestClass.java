@@ -48,6 +48,7 @@ public class TestClass {
             }
             p.put("jboss.naming.client.ejb.context", true);
             context = new InitialContext(p);
+            
             ISecManager secMngr = (ISecManager) context.lookup(jndiProject + "SecManager!org.javabeanstack.security.ISecManagerRemote");
             IUserSession userSession = secMngr.createSession(appuser_login, appuser_pass, app_idcompany, null);        
             sessionId = userSession.getSessionId();
