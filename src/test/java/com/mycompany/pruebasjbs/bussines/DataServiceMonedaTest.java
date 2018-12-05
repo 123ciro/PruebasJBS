@@ -63,7 +63,7 @@ public class DataServiceMonedaTest extends TestClass {
         assertNotNull(instance);
     }
 
-
+    
     @Test
     public void test10FindById() throws Exception {
         System.out.println("Find By Id");
@@ -114,7 +114,7 @@ public class DataServiceMonedaTest extends TestClass {
             return;
         }
         IMonedaSrv dataServiceMoneda = 
-                (IMonedaSrv) context.lookup(jndiProject+"MonedaSrv!org.pruebasciro.business.IRegionSrvRemote");
+                (IMonedaSrv) context.lookup(jndiProject+"MonedaSrv!org.pruebasciro.business.IMonedaSrvRemote");
         
         IGenericDAO dao = dataLink.getDao();
         //Cambiar dao por dataService.
