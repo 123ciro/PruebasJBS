@@ -10,6 +10,7 @@ import org.javabeanstack.data.IGenericDAORemote;
 import org.javabeanstack.data.model.DataSet;
 import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
+import org.javabeanstack.datactrl.events.DataEvents;
 import org.javabeanstack.error.IErrorReg;
 import org.javabeanstack.exceptions.SessionError;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
 
 public class EjerciciosDataObjectTest extends TestClass {
 
-    private static IGenericDAORemote dao;
+   private static IGenericDAORemote dao;
 
     @Test
     public void varios() throws Exception, NamingException, SessionError {
@@ -27,7 +28,13 @@ public class EjerciciosDataObjectTest extends TestClass {
             return;
         }
         //MONEDA
-        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
+        DataEvents events = new DataEvents();
+        
+        //se asigna el data events al dataobject
+        IDataObject<Moneda> moneda = new DataObject(Moneda.class, events, dataLink, null);
+               
+        //aca se realiza la operacion antes del open == beforeOpen
+              
         moneda.open();
         if (!moneda.find("codigo", "URU")) {
             moneda.insertRow();
@@ -39,7 +46,12 @@ public class EjerciciosDataObjectTest extends TestClass {
             assertTrue(result);
 
         }
-
+        //se agrega el registro y se cierra la conexión
+        moneda.close();
+        
+        moneda.open();
+        //se busca en la base la moneda con el codigo que recien se ingreso
+        //para eliminar el registro de prueba.
         if (moneda.find("codigo", "URU")) {
             moneda.deleteRow();
             boolean result = moneda.update(false);
@@ -57,11 +69,13 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
+        
+        //se hace un find en la base de datos por codigo.
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.setFilter("codigo = 'EUR'");
         moneda.getFilter();
+        //una vez que se realiza el fin, se tiene que hacer el requery(volver a consultar) en la base
         moneda.requery();
 
         System.out.println("Moneda Filtrada--> " + moneda.getRow());
@@ -75,7 +89,8 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
+        
+        //se ordena los datos en forma ascendente contra la columna idmoneda.
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.setOrder("idmoneda asc");
@@ -95,7 +110,8 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-        moneda.setFirstRow(2);
+        //se trae el registro en la posicion que se asigna.
+        moneda.setFirstRow(0);
         moneda.getFirstRow();
         moneda.requery();
 
@@ -120,6 +136,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         System.out.println("Registros --> " + moneda.getDataRows());
     }
 
+    
     @Test
     public void testReadWriteFalse() throws Exception, NamingException, SessionError {
         System.out.println("ReadWrite False");
@@ -165,9 +182,10 @@ public class EjerciciosDataObjectTest extends TestClass {
             moneda.deleteRow();
             moneda.update(false);
         }
-
     }
 
+    
+    
     @Test
     public void testClaveForanea() throws Exception, NamingException, SessionError {
         System.out.println("Clave Foranea");
@@ -178,15 +196,17 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-
+        //se pregunta si en la tabla de moneda, existe la clave foranea de pais.
         assertFalse(moneda.isForeingKey("pais"));
         assertTrue(!moneda.isForeingKey("pais"));
 
     }
-    
-        @Test
+
+    @Test
     public void testClaveForaneaPais() throws Exception, NamingException, SessionError {
+
         System.out.println("Clave Foranea");
+
         if (error != null) {
             System.out.println(error);
             return;
@@ -194,12 +214,10 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Pais> pais = new DataObject(Pais.class, null, dataLink, null);
         pais.open();
-
-        
+        //se pregunta si en la tabla de pais, existe la clave foranea de región
         assertTrue(pais.isForeingKey("Region"));
 
     }
-    
 
     @Test
     public void testColumnaExiste() throws Exception, NamingException, SessionError {
@@ -211,7 +229,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
-
+        //se pregunta si en la tabla de moneda existe la columna de nombre.
         assertTrue(moneda.isFieldExist("nombre"));
         assertFalse(moneda.isFieldExist("nombres"));
 
@@ -226,6 +244,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //se hace un filtrado y se busca solo la moneda con el id 245
         moneda.setFilter("idmoneda=245");
         moneda.requery();
         System.out.println("Valor -->" + moneda.getRow());
@@ -239,7 +258,7 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
+        //se traen todos los datos que existen en la tabla de moneda.
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
 
@@ -257,6 +276,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //al hacer un find, y buscamos en la base el codigo EUR, se puntero se posiciona en ese lugar.
         moneda.find("codigo", "EUR");
         int pos = 2;
         assertEquals(pos, moneda.getRecno());
@@ -275,6 +295,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         moneda.find("codigo", "EUR");
         String cod = "EUR";
         System.out.println("valor ->" + moneda.getRow());
+        //se traen los datos que se encuentra en la columna de codigo
         assertEquals(cod, moneda.getField("codigo"));
 
     }
@@ -288,6 +309,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //se hace una busqueda en la base de datos.
         moneda.find("codigo", "EUR");
         assertNotNull(moneda.getRow());
 
@@ -302,6 +324,8 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //se hace un find en la base, se busca el datos con código GS y 
+        //despúes de encontrar ese dato, se busca el siguiente.
         moneda.find("codigo", "GS ");
         moneda.findNext();
         moneda.requery();
@@ -316,14 +340,13 @@ public class EjerciciosDataObjectTest extends TestClass {
             System.out.println(error);
             return;
         }
-
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //hacemos que el puntero se posicione en la segunda fila.
         moneda.goTo(2);
         String esperado = "EUR";
         System.out.println("valor -->" + moneda.getRow());
         assertEquals(esperado, moneda.getField("codigo"));
-
     }
 
     @Test
@@ -336,6 +359,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //hacemos que el puntero se posicione en el primer registro.
         moneda.moveFirst();
         String esperado = "GS ";
         assertEquals(esperado, moneda.getField("codigo"));
@@ -351,6 +375,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //posicionamos el puntero en el primer registro y pasamos al siguiente con el moveNext
         moneda.moveFirst();
         moneda.moveNext();
         String esperado = "USD";
@@ -367,6 +392,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //buscamos en la base el elemento con codigo EUR y despues asignamos el puntero en el anterior elemento
         moneda.find("codigo", "EUR");
         moneda.movePrevious();
         String esperado = "USD";
@@ -383,6 +409,7 @@ public class EjerciciosDataObjectTest extends TestClass {
 
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
+        //posicionamos el puntero en el ultimo elemento
         moneda.moveLast();
         String esperado = "EUR";
         assertEquals(esperado, moneda.getField("codigo"));
@@ -399,8 +426,11 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         moneda.moveLast();
+        //el puntero esta posicionado en el ultimo elemento, pero ese no es el final de la lista de elementos
         assertFalse(moneda.isEof());
 
+        //posicionamos el puntero en el ultimo elemento y pasamos el puntero a la siguiente posicion la cual 
+        //ya es el final de las listas.
         moneda.moveLast();
         moneda.moveNext();
         assertTrue(moneda.isEof());
@@ -418,6 +448,7 @@ public class EjerciciosDataObjectTest extends TestClass {
         IDataObject<Moneda> moneda = new DataObject(Moneda.class, null, dataLink, null);
         moneda.open();
         int canti = 3;
+        //traemos la cantidad de valores que existe en la lista de datos
         System.out.println("cantidad de valores -->" + moneda.getRowCount());
         assertEquals(canti, moneda.getRowCount());
 
@@ -472,7 +503,8 @@ public class EjerciciosDataObjectTest extends TestClass {
             moneda.setField("nombre", "Uruguay");
             moneda.setField("cambio", BigDecimal.TEN);
             moneda.update(false);
-            assertTrue(moneda.checkData(true));
+            //hacemos un check data de los valos que vamos a ingresar
+            assertTrue(moneda.checkData(false));
 
         }
 
@@ -501,6 +533,7 @@ public class EjerciciosDataObjectTest extends TestClass {
             moneda.setField("nombre", "Uruguay");
             moneda.setField("cambio", BigDecimal.TEN);
             moneda.update(false);
+            //revisamos si existe algun error en el checkeo de datos.
             Map<String, IErrorReg> resultado = moneda.checkDataRow();
             System.out.println("Errores -->" + resultado);
             assertEquals(resultadoEsp, resultado);
@@ -532,7 +565,8 @@ public class EjerciciosDataObjectTest extends TestClass {
             moneda.setField("nombre", "Uruguay");
             moneda.setField("cambio", BigDecimal.TEN);
         }
-
+        //se ingresa un registro a la lista, pero esta todavia no es ingresada a la base de datos.
+        //por eso tenemos la posivilidad de eliminar ese dato con un revert.
         IDataSet dataSet = new DataSet();
         dataSet.addDataObject("moneda", moneda);
 
@@ -550,9 +584,11 @@ public class EjerciciosDataObjectTest extends TestClass {
             return;
         }
 
-        // DataEventsTest dataEvents = new DataEventsTest();
-        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
-
+        
+        DataEvents evento = new DataEvents();
+        
+        IDataObject moneda = new DataObject(Moneda.class, evento, dataLink, null);
+        //abrimos una conexion con los siguiente parametros (orden.filtro,readwrite,cantidad de datos a traer).
         moneda.open("idmoneda desc", null, true, 10);
         System.out.println("datos " + moneda.getDataRows());
 
@@ -565,10 +601,8 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
 
         if (moneda.find("codigo", "URU")) {
-
             moneda.deleteRow();
             moneda.update(false);
-
         }
 
     }
@@ -582,9 +616,11 @@ public class EjerciciosDataObjectTest extends TestClass {
         }
 
         IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
-
+        
+        //obtenemos el id de la empresa en la cual esta logueado el usuario.
         System.out.println("Id Empresa ->" + moneda.getIdcompany());
-
+        assertNotNull(moneda);
+        
     }
 
 }

@@ -381,7 +381,17 @@ public class AppUser extends DataRow implements IAppUser {
 
     @Override
     public String toString() {
-        return "Usuario{" + "idusuario=" + iduser + ", codigo=" + code + ", nombre=" + fullName + ", clave=" + pass + ", clave2=" + passConfirm + ", descripcion=" + description + ", disable=" + disable + ", expira=" + expiredDate + ", rol=" + rol + ", tipo=" + type + '}';
+        return "=============================================== \n"
+                + "Usuario{" + "idusuario=" + iduser + "\n"
+                + ", codigo=" + code + "\n"
+                + ", nombre=" + fullName + "\n"
+                + ", clave=" + pass + "\n"
+                + ", clave2=" + passConfirm + "\n"
+                + ", descripcion=" + description + "\n"
+                + ", disable=" + disable + "\n"
+                + ", expira=" + expiredDate + "\n"
+                + ", rol=" + rol + "\n"
+                + ", tipo=" + type + '}';
     }
     
     @PreUpdate
