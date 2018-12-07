@@ -1,5 +1,6 @@
 package com.mycompany.pruebasjbs.bussines;
 
+import com.mycompany.pruebasjbs.tables.Moneda;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import org.apache.log4j.Logger;
@@ -7,8 +8,8 @@ import org.javabeanstack.annotation.CheckMethod;
 import org.javabeanstack.data.IDataRow;
 import org.javabeanstack.error.ErrorReg;
 import org.javabeanstack.error.IErrorReg;
-import org.javabeanstack.model.tables.Moneda;
-import org.javabeanstack.services.DataService;
+
+import org.javabeanstack.data.services.DataService;
 import org.javabeanstack.util.Strings;
 
 /**
@@ -58,7 +59,7 @@ public class MonedaSrv extends DataService implements IMonedaSrv {
     @Override
     public IErrorReg checkCambio(String sessionId, Moneda row) {
         IErrorReg errorReg = new ErrorReg();
-        LOGGER.info("IN checkNombre");
+        LOGGER.info("IN checkCambio");
         if (Strings.isNullorEmpty(row.getNombre())) {
             errorReg.setMessage("No deje en blanco el campo de cambio");
         }

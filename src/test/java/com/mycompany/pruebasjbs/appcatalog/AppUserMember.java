@@ -1,4 +1,4 @@
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.appcatalog;
 
 import java.util.Objects; 
 import javax.persistence.Basic;
@@ -18,19 +18,19 @@ import org.javabeanstack.model.IAppUserMember;
 @Entity
 @Table(name = "usuariomiembro")
 public class AppUserMember extends DataRow implements IAppUserMember {
-    private static final long serialVersionUID = -558553967080513790L;
-    
+    private static final long serialVersionUID = 0L;
+     
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "idusuariomiembro")
+    @Column(name = "idusuariomiembro") 
     private Long idusermember;
     
-    @JoinColumn(name = "idmiembro", referencedColumnName = "idusuario")
+    @JoinColumn(name = "idmiembro", referencedColumnName = "idusuario", nullable = false)
     @ManyToOne(optional = false)
     private AppUser usermember;
 
-    @JoinColumn(name = "idusuario", referencedColumnName = "idusuario")
+    @JoinColumn(name = "idusuario", referencedColumnName = "idusuario", nullable = false)
     @ManyToOne(optional = false)
     private AppUser usergroup;
     

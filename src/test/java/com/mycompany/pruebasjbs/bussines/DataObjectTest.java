@@ -5,6 +5,9 @@
  */
 package com.mycompany.pruebasjbs.bussines;
 
+import com.mycompany.pruebasjbs.tables.Moneda;
+import com.mycompany.pruebasjbs.tables.Pais;
+import com.mycompany.pruebasjbs.tables.Region;
 import java.math.BigDecimal;
 import javax.naming.NamingException;
 import org.javabeanstack.data.IDataSet;
@@ -13,11 +16,9 @@ import org.javabeanstack.data.model.DataSet;
 import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
 import org.javabeanstack.exceptions.SessionError;
-import org.javabeanstack.model.tables.Moneda;
-import org.javabeanstack.model.tables.Pais;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.javabeanstack.model.tables.Region;
+
 
 public class DataObjectTest extends TestClass {
 

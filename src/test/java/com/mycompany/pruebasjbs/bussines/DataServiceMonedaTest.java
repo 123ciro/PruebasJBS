@@ -22,27 +22,25 @@
  */
 package com.mycompany.pruebasjbs.bussines;
 
-import java.util.HashMap;
+import com.mycompany.pruebasjbs.model.AppUser;
+import com.mycompany.pruebasjbs.tables.Moneda;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import org.javabeanstack.data.IDataResult;
-import org.javabeanstack.data.IDataRow;
 import org.javabeanstack.data.IDataSet;
 import org.javabeanstack.data.IGenericDAO;
 import org.javabeanstack.data.model.DataSet;
+import org.javabeanstack.data.services.IDataServiceRemote;
 import org.javabeanstack.datactrl.DataObject;
 import org.javabeanstack.datactrl.IDataObject;
-import org.javabeanstack.error.IErrorReg;
-import org.javabeanstack.model.tables.Moneda;
-import org.javabeanstack.services.IDataServiceRemote;
+import org.javabeanstack.util.Strings;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 
-
 public class DataServiceMonedaTest extends TestClass {
 
-    private static IDataServiceRemote dataService;
+       private static IDataServiceRemote dataService;
 
     public DataServiceMonedaTest() {
     }
@@ -51,14 +49,14 @@ public class DataServiceMonedaTest extends TestClass {
     public static void setUpClass2() {
         try {
             dataService
-                    = (IDataServiceRemote) context.lookup(jndiProject + "DataService!org.javabeanstack.services.IDataServiceRemote");
+                    = (IDataServiceRemote) context.lookup(jndiProject + "DataService!org.javabeanstack.data.services.IDataServiceRemote");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     @Test
-    public void test01Instance() throws Exception {
+    public void test01Instance1() throws Exception {
         System.out.println("1-DataService - TestInstance");
         //No hubo conexión con el servidor de aplicaciones
         if (error != null) {
@@ -66,347 +64,70 @@ public class DataServiceMonedaTest extends TestClass {
             return;
         }
         IDataServiceRemote instance
-                = (IDataServiceRemote) context.lookup(jndiProject + "DataService!org.javabeanstack.services.IDataServiceRemote");
+                = (IDataServiceRemote) context.lookup(jndiProject + "DataService!org.javabeanstack.data.services.IDataServiceRemote");
         assertNotNull(instance);
     }
 
-    /**
-     * Prueba control de los unique keys
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void test02CheckUnique1() throws Exception {
-        System.out.println("2-DataService - CheckUnique1");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        Moneda row = dataService.find(Moneda.class, sessionId).get(0);
-        // Va a pasar la prueba porque es el mismo objeto
-        assertTrue(dataService.checkUniqueKey("", row));
-    }
-
-    /**
-     * Prueba control de los unique keys
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void test03CheckUnique2() throws Exception {
-        System.out.println("3-DataService - TestCheckUnique2");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        List<Moneda> rows = dataService.find(Moneda.class, sessionId);
-        Moneda row = rows.get(0);
-        // Necesita del parametro sessionId para acceder a la unidad de persistencia adecuado
-        assertTrue(dataService.checkUniqueKey(sessionId, row));
-    }
-
-    /**
-     * Prueba unique key
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void test04CheckUniqueKey3() throws Exception {
-        System.out.println("4-DataService - TestCheckUniqueKey3");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        Moneda moneda = dataService.find(Moneda.class, sessionId).get(0);
-
-        Map<String, IErrorReg> errors;
-
-        moneda.setAction(IDataRow.MODIFICAR);
-        errors = dataService.checkDataRow(sessionId, moneda);
-        assertTrue(errors.isEmpty());
-
-        moneda.setIdmoneda(0L);
-        moneda.setAction(IDataRow.AGREGAR);
-        errors = dataService.checkDataRow(sessionId, moneda);
-        assertFalse(errors.isEmpty());
-
-        moneda.setAction(IDataRow.BORRAR);
-        errors = dataService.checkDataRow(sessionId, moneda);
-        assertTrue(errors.isEmpty());
-
-        moneda.setCodigo("xxx");
-        moneda.setAction(IDataRow.AGREGAR);
-        errors = dataService.checkDataRow(sessionId, moneda);
-        assertTrue(errors.isEmpty());
-    }
-
-    /**
-     * Chequeo de los foreignkeys
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void test06CheckForeignKey2() throws Exception {
-        System.out.println("6-DataService - TestCheckForeignkey2");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        Map<String, IErrorReg> errors;
-        Moneda moneda = dataService.find(Moneda.class, sessionId).get(0);
-        moneda.setAction(IDataRow.MODIFICAR);
-        // Necesita del parametro sessionId para acceder a la unidad de persistencia adecuado        
-        errors = dataService.checkDataRow(sessionId, moneda);
-        assertTrue(errors.isEmpty());
-    }
-
-    /**
-     * Test of setListFieldCheck method, of class AbstractDataService.
-     */
-    @Test
-    public void test09SetFieldsChecked() throws Exception {
-        System.out.println("9-DataService - setFieldsChecked");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        IMonedaSrv dataServiceMoneda
-                = (IMonedaSrv) context.lookup(jndiProject + "MonedaSrv!org.javabeanstack.services.IMonedaSrvRemote");
-
-        IGenericDAO dao = dataLink.getDao();
-        dataLink.setDao(dataServiceMoneda);
-        //Moneda
-        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
-        moneda.open();
-        if (moneda.find("codigo", "ZZZ")) {
-            moneda.refreshRow();
-            moneda.deleteRow();
-            IDataResult dataResult = dataServiceMoneda.save(sessionId, moneda.getRow());
-            assertTrue(dataResult.getRowUpdated().isFieldChecked("codigo"));
-            assertTrue(dataResult.getRowUpdated().isFieldChecked("nombre"));
-        }
-        moneda.insertRow();
-        moneda.setField("codigo", "ZZZ");
-        moneda.setField("nombre", "ZZZ BORRAR");
-
-        IDataResult dataResult = dataServiceMoneda.save(sessionId, moneda.getRow());
-        assertTrue(dataResult.isSuccessFul());
-        assertTrue(dataResult.getRowUpdated().isRowChecked());
-        assertTrue(dataResult.getRowUpdated().isFieldChecked("codigo"));
-        assertTrue(dataResult.getRowUpdated().isFieldChecked("nombre"));
-
-        moneda.close();
-        moneda.open();
-        if (moneda.find("codigo", "ZZZ")) {
-            moneda.deleteRow();
-            dataResult = dataServiceMoneda.save(sessionId, moneda.getRow());
-            assertTrue(dataResult.isSuccessFul());
-            assertTrue(dataResult.getRowUpdated().isFieldChecked("codigo"));
-            assertTrue(dataResult.getRowUpdated().isFieldChecked("nombre"));
-        }
-        dataLink.setDao(dao);
-    }
-
-    /**
-     * Test of findById method, of class AbstractDataService.
-     */
     @Test
     public void test10FindById() throws Exception {
-        System.out.println("10-DataService - findById");
+        System.out.println("Find By Id");
         // Cuando sessionId es null solo se puede acceder al schema catalogo
-        String sessionid = null;
+        //   String sessionid = null;
         //No hubo conexión con el servidor de aplicaciones
         if (error != null) {
             System.out.println(error);
             return;
         }
-        Moneda moneda = dataService.findById(Moneda.class, sessionid, 1L);
+        Moneda moneda = dataService.findById(Moneda.class, sessionId, 244L);
+        System.out.println("valores --> " + dataService.findById(Moneda.class, sessionId, 244L));
         assertNotNull(moneda);
 
-        moneda = dataService.findById(Moneda.class, sessionid, 0L);
+        moneda = dataService.findById(Moneda.class, sessionId, 0L);
         assertNull(moneda);
     }
 
-    /**
-     * Test of find method, of class AbstractDataService.
-     *
-     * @throws java.lang.Exception
-     */
     @Test
-    public void test12Find() throws Exception {
-        System.out.println("12-DataService - find");
-        // Cuando sessionId es null solo se puede acceder al schema catalogo
-        String sessionid = null;
+    public void DataServicePersist() throws Exception {
+        System.out.println("Test persist");
         //No hubo conexión con el servidor de aplicaciones
         if (error != null) {
             System.out.println(error);
             return;
         }
-        List<Moneda> monedas = dataService.find(Moneda.class, sessionid);
-        assertTrue(monedas.size() > 0);
+        //Agregar
+        Moneda moneda = new Moneda();
+        moneda.setCodigo("BOL");
+        moneda.setNombre("Bolivares");
+        moneda.setIdempresa(Long.valueOf(41));
+        moneda.setCambio(BigDecimal.ONE);
+        IDataResult dataResult = dataService.persist(sessionId, moneda);
+        assertNotNull(dataResult);
 
-        String order = "code desc";
-        String filter = "";
-        monedas = dataService.find(Moneda.class, sessionid, order, filter, null);
-        assertTrue(monedas.size() > 0);
-
-        filter = "code = 'Administrador'";
-        monedas = dataService.find(Moneda.class, sessionid, order, filter, null);
-        assertTrue(monedas.size() == 1);
-
-        filter = "code = :code";
-        Map<String, Object> params = new HashMap();
-        params.put("code", "Administrador");
-        monedas = dataService.find(Moneda.class, sessionid, order, filter, params);
-        assertTrue(monedas.size() == 1);
-
-        monedas = dataService.find(Moneda.class, sessionid, null, "", null, 0, 4);
-        assertTrue(monedas.size() == 4);
+        //Buscar la moneda
+        List<Moneda> monedas = dataService.findListByQuery(sessionId, "select o from Moneda o where codigo = 'BOL'", null);
+        //eliminar
+        dataService.remove(sessionId, monedas.get(0));
     }
 
-    /**
-     * Test of findByQuery method, of class AbstractDataService.
-     *
-     * @throws java.lang.Exception
-     */
+//    @Test
+//    public void test11FindByUk() throws Exception {
+//        System.out.println("FindByUk");
+//        //No hubo conexión con el servidor de aplicaciones
+//        String sessionid = null;
+//        if (error != null) {
+//            System.out.println(error);
+//            return;
+//        }
+//        AppUser user = new AppUser();
+//        user.setCode("j");
+//        user = dataService.findByUk(sessionid, user);
+//        System.out.println("valores" + user);
+//        assertNotNull(user);
+//
+//    }
     @Test
-    public void test13FindByQuery() throws Exception {
-        System.out.println("13-DataService - findByQuery");
-        // Cuando sessionId es null solo se puede acceder al schema catalogo
-        String sessionid = null;
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        Moneda moneda = dataService.findByQuery(sessionid, "select o from Moneda o where idmoneda = 1L", null);
-        assertNotNull(moneda);
-
-        moneda = dataService.findByQuery(sessionid, "select o from Moneda o where idmoneda = 0L", null);
-        assertNull(moneda);
-
-        Map<String, Object> params = new HashMap();
-        params.put("idmoneda", 1L);
-        moneda = dataService.findByQuery(sessionid, "select o from Moneda o where idmoneda = :idmoneda", params);
-        assertNotNull(moneda);
-    }
-
-    /**
-     * Test of findListByQuery method, of class AbstractDataService.
-     */
-    @Test
-    public void test14FindListByQuery() throws Exception {
-        System.out.println("14-DataService - findListByQuery");
-        // Cuando sessionId es null solo se puede acceder al schema catalogo
-        String sessionid = null;
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        List<Moneda> monedas = dataService.findListByQuery(sessionid, "select o from Moneda o where idmoneda = 1L", null);
-        assertNotNull(monedas);
-
-        monedas = dataService.findListByQuery(sessionid, "select o from Moneda o where idmoneda = 0L", null);
-        assertTrue(monedas.isEmpty());
-
-        Map<String, Object> params = new HashMap();
-        params.put("idmoneda", 1L);
-        monedas = dataService.findListByQuery(sessionid, "select o from Moneda o where idmoneda = :idmoneda", params);
-        assertNotNull(monedas);
-    }
-
-    /**
-     * Test of findByNativeQuery method, of class AbstractDataService.
-     */
-    @Test
-    public void test16FindByNativeQuery() throws Exception {
-        System.out.println("16-DataService - findByNativeQuery");
-        //No hubo conexión con el servidor de aplicaciones
-        
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        // Cuando sessionId es null solo se puede acceder al schema catalogo
-        String sqlSentence = "select * from {schema}.moneda where idmoneda > :id";
-        Map<String, Object> params = new HashMap();
-        params.put("id", 144);
-        List<Object> query1 = dataService.findByNativeQuery(sessionId, sqlSentence, params);
-        
-        assertTrue(!query1.isEmpty());
-
-        // Un grupo de registros first, max
-        query1 = dataService.findByNativeQuery(sessionId, sqlSentence, params, 0, 10);
-        assertTrue(!query1.isEmpty());
-    }
-
-    /**
-     * Test of getDataRows method, of class AbstractDataService.
-     */
-    @Test
-    public void get20DataRows() throws Exception {
-        System.out.println("20-DataService - getDataRows");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        List<Moneda> monedas = dataService.getDataRows(sessionId, Moneda.class, "", "", null, 0, 1000);
-        System.out.println("valores dentro de moneda  ->" + dataService.getDataRows(sessionId, Moneda.class, "", "", null, 0, 1000));
-        assertFalse(monedas.isEmpty());
-    }
-
-    /**
-     * Test of update method, of class AbstractDataService.
-     */
-    @Test
-    public void test26Update_String_List() throws Exception {
-        System.out.println("26-DataService - update");
-        //No hubo conexión con el servidor de aplicaciones
-        if (error != null) {
-            System.out.println(error);
-            return;
-        }
-        //Moneda
-        IDataObject moneda = new DataObject(Moneda.class, null, dataLink, null);
-        moneda.open();
-        if (moneda.find("codigo", "ZZZ")) {
-            moneda.refreshRow();
-            moneda.deleteRow();
-            moneda.checkDataRow();
-            IDataResult dataResult = dataService.update(sessionId, moneda.getDataRows());
-            assertTrue(dataResult.isSuccessFul());
-        }
-        moneda.insertRow();
-        moneda.setField("codigo", "ZZZ");
-        moneda.setField("nombre", "ZZZ BORRAR");
-        moneda.checkDataRow();
-
-        IDataResult dataResult = dataService.update(sessionId, moneda.getDataRows());
-        assertTrue(dataResult.isSuccessFul());
-
-        moneda.close();
-        moneda.open();
-        if (moneda.find("codigo", "ZZZ")) {
-            moneda.deleteRow();
-            moneda.checkDataRow();
-            dataResult = dataService.update(sessionId, moneda.getDataRows());
-            assertTrue(dataResult.isSuccessFul());
-        }
-    }
-
-    /**
-     * Test of update method, of class AbstractDataService.
-     */
-    @Test
-    public void test27Update_String_IDataSet() throws Exception {
-        System.out.println("27-DataService - update");
+    public void TestInsertandDeleteMoneda() throws Exception {
+        System.out.println("Insert and Delete Moneda");
         //No hubo conexión con el servidor de aplicaciones
         if (error != null) {
             System.out.println(error);
@@ -420,30 +141,249 @@ public class DataServiceMonedaTest extends TestClass {
         moneda.open();
         IDataSet dataSet = new DataSet();
         dataSet.addDataObject("moneda", moneda);
-
-        if (moneda.find("codigo", "ZZZ")) {
-            moneda.refreshRow();
-            moneda.deleteRow();
+        if (!moneda.find("codigo", "PER")) {
+            moneda.insertRow();
+            moneda.setField("codigo", "PER");
+            moneda.setField("nombre", "PERU");
+            moneda.setField("cambio", BigDecimal.TEN);
+            dataSet = new DataSet();
+            dataSet.addDataObject("moneda", moneda);
             assertTrue(moneda.update(dataSet));
+            moneda.close();
         }
-        moneda.insertRow();
-        moneda.setField("codigo", "ZZZ");
-        moneda.setField("nombre", "ZZZ BORRAR");
-        dataSet = new DataSet();
-        dataSet.addDataObject("moneda", moneda);
-        assertTrue(moneda.update(dataSet));
-
-        moneda.close();
         moneda.open();
-        if (moneda.find("codigo", "ZZZ")) {
+        if (moneda.find("codigo", "PER")) {
             moneda.deleteRow();
             moneda.checkDataRow();
             dataSet = new DataSet();
             dataSet.addDataObject("moneda", moneda);
             assertTrue(moneda.update(dataSet));
+            moneda.close();
         }
         //Devolver dataLink a valores por defecto
         dataLink.setDao(dao);
+    }
+
+    @Test
+    public void TestInsertandDeleteUser() throws Exception {
+        System.out.println("Insert and Delete User");
+        //No hubo conexión con el servidor de aplicaciones
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        IGenericDAO dao = dataLinkCat.getDao();
+        //Cambiar dao por dataService.
+        dataLinkCat.setDao(dataService);
+        //Moneda
+        IDataObject user = new DataObject(AppUser.class, null, dataLinkCat, null);
+        user.open();
+        String clave="contraseñaparaelingreso";
+        String codigo ="ciroferra7";
+        String nombre ="Ciro Enrique Ferrario Chavez";
+        String añadir= Strings.encode64(nombre+codigo);
+        String clave64 = Strings.encode64(clave);
+        
+        IDataSet dataSet = new DataSet();
+        dataSet.addDataObject("user", user);
+        if (!user.find("code", "LUISI")) {
+            user.insertRow();
+            user.setField("code", "LUISI");
+            user.setField("fullname", "LUISITO");
+            user.setField("pass", clave64+añadir);
+            user.setField("idcompany", Long.valueOf(2));
+            dataSet = new DataSet();
+            dataSet.addDataObject("user", user);
+            assertTrue(user.update(dataSet));
+            user.close();
+        }
+        user.open();
+        if (user.find("code", "LUISI")) {
+            user.deleteRow();
+            user.checkDataRow();
+            dataSet = new DataSet();
+            dataSet.addDataObject("user", user);
+            assertTrue(user.update(dataSet));
+            user.close();
+        }
+        //Devolver dataLink a valores por defecto
+        dataLinkCat.setDao(dao);
+    }
+
+    
+    //TODO: ERROR QUE ME SALE --> datos.moneda is not mapped [select count(*) FROM datos.moneda o]
+//    @Test
+//    public void CantidadMoneda() throws Exception {
+//        System.out.println("Cantidad Moneda");
+//        // Cuando sessionId es null solo se puede acceder al schema catalogo
+//        String sessionid = null;
+//        //No hubo conexión con el servidor de aplicaciones
+//        if (error != null) {
+//            System.out.println(error);
+//            return;
+//        }
+//        Long rec = dataService.getCount(sessionId, "select o FROM {schema}.moneda o", null);
+//    //    System.out.println("valor ->" + dataService.getCount(sessionId, "select o FROM moneda o", null));
+//        assertTrue(rec > 0L);
+//    }
+    
+    @Test
+    public void CantidadUser() throws Exception {
+        System.out.println("Cantidad User");
+        // Cuando sessionId es null solo se puede acceder al schema catalogo
+        String sessionid = null;
+        //No hubo conexión con el servidor de aplicaciones
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        Long rec = dataService.getCount(sessionid, "select o FROM AppUser o", null);
+        System.out.println("valor ->" + dataService.getCount(sessionid, "select o FROM AppUser o", null));
+        assertTrue(rec > 0L);
+    }
+
+    @Test
+    public void EsquemaCatalodo() throws Exception {
+        System.out.println("EsquemaCatalogo");
+        //No hubo conexión con el servidor de aplicaciones
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        //trae el esquema de catalogo.
+        System.out.println(dataService.getSchema("PU1"));
+
+        String expResult = dataService.getSchema("PU1");
+        assertNotNull(expResult);
+    }
+
+    @Test
+    public void EsquemaDatos() throws Exception {
+        System.out.println("EsquemaDatos");
+        //No hubo conexión con el servidor de aplicaciones
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        //trae el esquema de datos.
+        System.out.println(dataService.getSchema("PU2"));
+
+        String expResult = dataService.getSchema("PU2");
+        assertNotNull(expResult);
+    }
+
+    @Test
+    public void SesionUsuario() throws Exception {
+        System.out.println("Datos de la Sesión del Usuario");
+        //No hubo conexión con el servidor de aplicaciones
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        System.out.println("valores->" + dataService.getUserSession(sessionId));
+        assertNotNull(dataService.getUserSession(sessionId));
+    }
+
+    @Test
+    public void FindMonedas() throws Exception {
+        System.out.println("FindMonedas");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+        String order = "idmoneda desc";
+        String filter = "";
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        System.out.println(dataService.find(Moneda.class, sessionId, order, filter, null));
+    }
+
+    @Test
+    public void FindUser() throws Exception {
+        System.out.println("FindUser");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+        String order = "idusuario desc";
+        String filter = "";
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        System.out.println(dataService.find(AppUser.class, sessionid, order, filter, null));
+        // assertNotNull(dataService.find(AppUser.class, sessionid, order, filter, null));
+    }
+
+    @Test
+    public void FindByQueryMonedas() throws Exception {
+        System.out.println("FindByQueryMonedas");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        Moneda moneda = dataService.findByQuery(sessionId, "select o from Moneda o where idmoneda = 244L", null);
+        System.out.println("valor moneda -->" + moneda);
+        assertNotNull(moneda);
+
+    }
+
+    @Test
+    public void FindByQueryUser() throws Exception {
+        System.out.println("FindByQueryUser");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+        AppUser user = dataService.findByQuery(sessionid, "select o from AppUser o where iduser = 1L", null);
+        System.out.println("valor usuario -->" + user);
+        assertNotNull(user);
+    }
+
+    @Test
+    public void FindByNativeQueryMoneda() throws Exception {
+        System.out.println("FindByNativeQueryMoneda");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        String sql = "select * from {schema}.moneda where idmoneda > 0";
+
+        List<Object> query1 = dataService.findByNativeQuery(sessionId, sql, null);
+
+        System.out.println("valor monedas -->" + query1);
+        assertNotNull(query1);
+    }
+
+    @Test
+    public void FindByNativeQueryUser() throws Exception {
+        System.out.println("FindByNativeQueryUser");
+        //No hubo conexión con el servidor de aplicaciones
+        String sessionid = null;
+
+        if (error != null) {
+            System.out.println(error);
+            return;
+        }
+
+        String sql = "select * from catalogo.Usuario where idusuario > 0";
+
+        //para el getCount
+        String sql1 = "select o from AppUser o where idusuario > 0";
+
+        List<Object> query1 = dataService.findByNativeQuery(sessionid, sql, null);
+        System.out.println("cantidad datos " + dataService.getCount(sessionid, sql1, null));
+        System.out.println("valor usuarios --> \n" + query1 );
+        assertNotNull(query1);
     }
 
 }

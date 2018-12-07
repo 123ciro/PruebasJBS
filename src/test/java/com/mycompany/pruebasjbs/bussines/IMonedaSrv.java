@@ -1,10 +1,11 @@
 package com.mycompany.pruebasjbs.bussines;
 
+import com.mycompany.pruebasjbs.tables.Moneda;
 import org.javabeanstack.annotation.CheckMethod;
 import org.javabeanstack.data.IDataRow;
 import org.javabeanstack.error.IErrorReg;
-import org.javabeanstack.model.tables.Moneda;
-import org.javabeanstack.services.IDataService;
+
+import org.javabeanstack.data.services.IDataService;
 
 /**
  *
