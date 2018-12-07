@@ -1,4 +1,4 @@
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.model;
 
 import java.io.Serializable;
 import java.util.Date;

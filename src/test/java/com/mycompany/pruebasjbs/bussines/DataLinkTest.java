@@ -5,6 +5,7 @@
  */
 package com.mycompany.pruebasjbs.bussines;
 
+import com.mycompany.pruebasjbs.tables.Moneda;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import org.javabeanstack.data.IDataRow;
 import org.javabeanstack.data.IGenericDAORemote;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.javabeanstack.model.tables.Moneda;
+
 
 public class DataLinkTest extends TestClass {
 

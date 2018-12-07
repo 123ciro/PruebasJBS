@@ -12,7 +12,7 @@
 * is strictly forbidden unless prior written permission is obtained
 * from OyM System Group S.A.
  */
-package org.javabeanstack.model.tables;
+package com.mycompany.pruebasjbs.appcatalog;
 
 import java.math.BigInteger;
 import java.util.Date;
